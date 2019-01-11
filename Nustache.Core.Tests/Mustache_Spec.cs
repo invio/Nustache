@@ -1,18 +1,12 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
 using System.Text.RegularExpressions;
 using DynamicExpresso;
-using Microsoft.CSharp;
 using NUnit.Framework;
-using YamlDotNet.RepresentationModel.Serialization;
+using NUnit.Framework.Interfaces;
+using YamlDotNet.Serialization;
 
 namespace Nustache.Core.Tests
 {
@@ -22,13 +16,13 @@ namespace Nustache.Core.Tests
         public static Int32 GlobalCalls;
 
         [Test]
-        [TestCaseSource("Comments")]
-        [TestCaseSource("Delimiters")]
-        [TestCaseSource("Interpolation")]
-        [TestCaseSource("Inverted")]
-        [TestCaseSource("Partials")]
-        [TestCaseSource("Sections")]
-        [TestCaseSource("Lambdas")]
+        [TestCaseSource(nameof(Comments))]
+        [TestCaseSource(nameof(Delimiters))]
+        [TestCaseSource(nameof(Interpolation))]
+        [TestCaseSource(nameof(Inverted))]
+        [TestCaseSource(nameof(Partials))]
+        [TestCaseSource(nameof(Sections))]
+        [TestCaseSource(nameof(Lambdas))]
         public void AllTests(string name, Dictionary<object, object> data, string template, Dictionary<object, string> partials, string expected)
         {
             FixData(data);
@@ -79,7 +73,7 @@ namespace Nustache.Core.Tests
             if (data.ContainsKey("lambda"))
             {
                 var res = (Dictionary<object, object>)data["lambda"];
-                
+
                 //Hack for Interpolation Multiple calls as it uses globals which the library doesn't support entirely.
                 if (((String)res["js"]).Contains(".calls"))
                 {
@@ -113,18 +107,18 @@ namespace Nustache.Core.Tests
                     else if (value.Contains("function(txt)"))
                     {
                         var match = Regex.Match(value, @"function\((\w*)\)\s*{\s*return\s*([A-Za-z0-9 \"">=|{(}?+#._:;)]*)\s* }");
-                        if(match.Success) 
-                        {                            
+                        if(match.Success)
+                        {
                             var argumentName = match.Groups[1].Value;
                             var body = match.Groups[2].Value;
 
                             return new Interpreter().ParseAsDelegate<Lambda<string, object>>(body, argumentName);
                         }
-                    }                    
+                    }
                     return null;
                 });
         }
-        
+
         private void Visit(object value, Func<string, bool> pred, Func<string, object> func)
         {
             if (value is List<object>)
@@ -165,17 +159,17 @@ namespace Nustache.Core.Tests
             }
         }
 
-        public IEnumerable<ITestCaseData> Comments() { return GetTestCases("comments"); }
-        public IEnumerable<ITestCaseData> Delimiters() { return GetTestCases("delimiters"); }
-        public IEnumerable<ITestCaseData> Interpolation() { return GetTestCases("interpolation"); }
-        public IEnumerable<ITestCaseData> Inverted() { return GetTestCases("inverted"); }
-        public IEnumerable<ITestCaseData> Partials() { return GetTestCases("partials"); }
-        public IEnumerable<ITestCaseData> Sections() { return GetTestCases("sections"); }
-        public IEnumerable<ITestCaseData> Lambdas() { return GetTestCases("~lambdas"); }
+        public static IEnumerable<ITestCaseData> Comments() { return GetTestCases("comments"); }
+        public static IEnumerable<ITestCaseData> Delimiters() { return GetTestCases("delimiters"); }
+        public static IEnumerable<ITestCaseData> Interpolation() { return GetTestCases("interpolation"); }
+        public static IEnumerable<ITestCaseData> Inverted() { return GetTestCases("inverted"); }
+        public static IEnumerable<ITestCaseData> Partials() { return GetTestCases("partials"); }
+        public static IEnumerable<ITestCaseData> Sections() { return GetTestCases("sections"); }
+        public static IEnumerable<ITestCaseData> Lambdas() { return GetTestCases("~lambdas"); }
 
-        public IEnumerable<ITestCaseData> GetTestCases(string file)
+        public static IEnumerable<ITestCaseData> GetTestCases(string file)
         {
-            var text = File.ReadAllText(string.Format("../../../spec/specs/{0}.yml", file));
+            var text = File.ReadAllText(string.Format("../../../../spec/specs/{0}.yml", file));
             if (file.Equals("~lambdas")) text = CleanLambdaFile(text);
 
             var deserializer = new Deserializer();
@@ -186,7 +180,7 @@ namespace Nustache.Core.Tests
                 .SetName(file + ": " + test.name));
         }
 
-        private string CleanLambdaFile(String fileContents)
+        private static string CleanLambdaFile(String fileContents)
         {
             return fileContents.Replace("!code", "");
         }

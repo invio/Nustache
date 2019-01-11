@@ -9,12 +9,12 @@ namespace Nustache.Core.Tests.Mustache_Spec
     {
         private static MustacheSpec.MustacheTest[] SectionTests() { return GetSpecs("sections"); }
 
-        [Test, TestCaseSource("SectionTests")]
+        [Test, TestCaseSource(nameof(SectionTests))]
         public void Sections(MustacheSpec.MustacheTest test) { RunMustacheSpecs(test); }
 
         private static MustacheSpec.MustacheTest[] CommentTests() { return GetSpecs("comments"); }
 
-        [Test, TestCaseSource("CommentTests")]
+        [Test, TestCaseSource(nameof(CommentTests))]
         public void Comments(MustacheSpec.MustacheTest test) { RunMustacheSpecs(test); }
 
         // TODO: support changing delimiters
@@ -25,17 +25,17 @@ namespace Nustache.Core.Tests.Mustache_Spec
 
         private static MustacheSpec.MustacheTest[] InterpolationTests() { return GetSpecs("interpolation"); }
 
-        [Test, TestCaseSource("InterpolationTests")]
+        [Test, TestCaseSource(nameof(InterpolationTests))]
         public void Interpolation(MustacheSpec.MustacheTest test) { RunMustacheSpecs(test); }
 
         private static MustacheSpec.MustacheTest[] InvertedTests() { return GetSpecs("inverted"); }
 
-        [Test, TestCaseSource("InvertedTests")]
+        [Test, TestCaseSource(nameof(InvertedTests))]
         public void Inverted(MustacheSpec.MustacheTest test) { RunMustacheSpecs(test); }
 
         private static MustacheSpec.MustacheTest[] PartialsTests() { return GetSpecs("partials"); }
 
-        [Test, TestCaseSource("PartialsTests")]
+        [Test, TestCaseSource(nameof(PartialsTests))]
         public void Partials(MustacheSpec.MustacheTest test) { RunMustacheSpecs(test); }
 
         // uncomment this to regenerate the specs from the mustache spec submodule

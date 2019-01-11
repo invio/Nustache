@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System;
 
 namespace Nustache.Core.Tests
 {

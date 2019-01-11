@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
-using System.Web.Script.Serialization;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Nustache.Core.Tests.Mustache_Spec
 {
     /// <summary>
-    /// Strongly typed wrapper for a suite of tests from the 
+    /// Strongly typed wrapper for a suite of tests from the
     /// official mustache spec (https://github.com/mustache/spec)
     /// </summary>
     public class MustacheSpec
@@ -21,7 +20,7 @@ namespace Nustache.Core.Tests.Mustache_Spec
 
         public MustacheSpec(string name)
         {
-            rawSpecs = File.ReadAllText(String.Format("../../../spec/specs/{0}.json", name));
+            rawSpecs = File.ReadAllText(String.Format("../../../../spec/specs/{0}.json", name));
             jsonSpecs = JObject.Parse(rawSpecs);
             this.Tests = jsonSpecs["tests"].ToArray();
             this.StronglyTypedExamples = GetSpecs(this.Tests);
@@ -41,7 +40,7 @@ namespace Nustache.Core.Tests.Mustache_Spec
                 var name = Sanitize(test["name"].ToString());
                 specJson[name] =
                     JObject.Parse(StripReservedWords(test["data"].ToString()));
-                    
+
             }
             return specJson;
         }
@@ -69,7 +68,7 @@ namespace Nustache.Core.Tests.Mustache_Spec
         public List<MustacheTest> MustacheTests { get; set; }
 
         /// <summary>
-        /// Strongly typed wrapper for an individual test from the 
+        /// Strongly typed wrapper for an individual test from the
         /// official mustache spec (https://github.com/mustache/spec)
         /// </summary>
         public class MustacheTest
@@ -87,7 +86,9 @@ namespace Nustache.Core.Tests.Mustache_Spec
                 {
                     if (stronglyTypedExamples[SanitizedName] != null)
                         this.Example =
-                            new JavaScriptSerializer().DeserializeObject(stronglyTypedExamples[SanitizedName].ToString());
+                            JsonConvert.DeserializeObject(
+                                stronglyTypedExamples[SanitizedName].ToString()
+                            );
                     else
                         this.Example = new object();
 

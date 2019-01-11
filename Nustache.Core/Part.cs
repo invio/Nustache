@@ -1,4 +1,6 @@
 using System;
+using System.Runtime.ExceptionServices;
+
 namespace Nustache.Core
 {
     public abstract class Part
@@ -16,7 +18,7 @@ namespace Nustache.Core
             }
             catch (System.Reflection.TargetInvocationException ex)
             {
-                throw ex.InnerException;
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             }
         }
     }

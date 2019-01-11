@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -32,10 +31,10 @@ namespace Nustache.Core
 
         public Encoders.HtmlEncoder HtmlEncoder
         {
-            get { return _renderContextBehaviour.HtmlEncoder ?? Encoders.HtmlEncode; }   
+            get { return _renderContextBehaviour.HtmlEncoder ?? Encoders.HtmlEncode; }
         }
 
-        public RenderContext(Section section, object data, TextWriter writer, TemplateLocator templateLocator, RenderContextBehaviour renderContextBehaviour = null) 
+        public RenderContext(Section section, object data, TextWriter writer, TemplateLocator templateLocator, RenderContextBehaviour renderContextBehaviour = null)
         {
             _sectionStack.Push(section);
             _dataStack.Push(data);
@@ -165,20 +164,21 @@ namespace Nustache.Core
                 }
                 yield break;
             }
-            else if (value is bool)
+            else if (value is bool b)
             {
-                if ((bool)value)
+                if (b)
                 {
-                    yield return value;
+                    yield return true;
                 }
             }
-            else if (value is string)
+            else if (value is string s)
             {
-                if (!string.IsNullOrEmpty((string)value))
+                if (!string.IsNullOrEmpty(s))
                 {
-                    yield return value;
+                    yield return s;
                 }
             }
+            // Avoid adding a dependency on Newtonsoft.Json
             else if (value.GetType().ToString().Equals("Newtonsoft.Json.Linq.JValue"))
             {
                 yield return value;
@@ -190,24 +190,24 @@ namespace Nustache.Core
                     yield return value;
                 }
             }
-            else if (value is IDictionary) // Dictionaries also implement IEnumerable
-                                           // so this has to be checked before it.
+            else if (value is IDictionary dictionary) // Dictionaries also implement IEnumerable
+                                                      // so this has to be checked before it.
             {
-                if (((IDictionary)value).Count > 0)
+                if (dictionary.Count > 0)
                 {
-                    yield return value;
+                    yield return dictionary;
                 }
             }
-            else if (value is IEnumerable)
+            else if (value is IEnumerable enumerable)
             {
-                foreach (var item in ((IEnumerable)value))
+                foreach (var item in enumerable)
                 {
                     yield return item;
                 }
             }
-            else if (value is DataTable)
+            else if (value is DataTable table)
             {
-                foreach (var item in ((DataTable)value).Rows)
+                foreach (var item in table.Rows)
                 {
                     yield return item;
                 }
@@ -229,25 +229,25 @@ namespace Nustache.Core
             {
                 return false;
             }
-            
-            if (value is bool)
+
+            if (value is bool b)
             {
-                return (bool)value;
-            }
-            
-            if (value is string)
-            {
-                return !string.IsNullOrEmpty((string)value);
-            }
-            
-            if (value is IEnumerable)
-            {
-                return ((IEnumerable)value).GetEnumerator().MoveNext();
+                return b;
             }
 
-            if (value is DataTable)
+            if (value is string s)
             {
-                return ((DataTable)value).Rows.Count > 0;
+                return !string.IsNullOrEmpty(s);
+            }
+
+            if (value is IEnumerable enumerable)
+            {
+                return enumerable.GetEnumerator().MoveNext();
+            }
+
+            if (value is DataTable table)
+            {
+                return table.Rows.Count > 0;
             }
 
             return true;
@@ -302,8 +302,8 @@ namespace Nustache.Core
 
                 if (template != null)
                 {
-					// push the included template on the stack so that internally defined templates can be resolved properly later.
-					// designed to pass test Describe_Template_Render.It_can_include_templates_over_three_levels_with_external_includes()
+                    // push the included template on the stack so that internally defined templates can be resolved properly later.
+                    // designed to pass test Describe_Template_Render.It_can_include_templates_over_three_levels_with_external_includes()
                     this.Enter(template);
                     template.Render(this);
                     this.Exit();

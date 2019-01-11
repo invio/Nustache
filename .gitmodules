@@ -4,3 +4,6 @@
 [submodule "spec"]
 	path = spec
 	url = https://github.com/mustache/spec.git
+[submodule "lib/jsonclassgenerator"]
+	path = lib/jsonclassgenerator
+	url = git@github.com:codeyu/jsonclassgenerator.git

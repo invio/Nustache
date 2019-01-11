@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Dynamic;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Xml;
 
 namespace Nustache.Core
@@ -41,7 +43,7 @@ namespace Nustache.Core
             }
             catch (System.Reflection.TargetInvocationException ex)
             {
-                throw ex.InnerException;
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             }
         }
 
@@ -172,6 +174,24 @@ namespace Nustache.Core
         }
     }
 
+    internal class JObjectValueGetter : ValueGetter
+    {
+        private readonly object _object;
+        private readonly Delegate _getter;
+
+        public JObjectValueGetter(object @object, Delegate getter)
+        {
+            _object = @object;
+            _getter = getter;
+        }
+
+        public override object GetValue()
+        {
+            var value = _getter.DynamicInvoke(_object);
+            return JValueIdentifier.IsJValue(value) ? JValueIdentifier.GetValue(value) : value;
+        }
+    }
+
     public class MethodInfoValueGetter : ValueGetter
     {
         private readonly object _target;
@@ -290,7 +310,7 @@ namespace Nustache.Core
 
         public override object GetValue()
         {
-            if(_target.Table.Columns.Contains(_name)) 
+            if(_target.Table.Columns.Contains(_name))
             {
                 return _target[_name];
             }

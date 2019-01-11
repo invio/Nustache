@@ -29,7 +29,7 @@ namespace Nustache.Compilation
             {
                 part.Accept(this);
             }
-            
+
             result = Concat(parts.Where(part => part != null));
         }
 
@@ -39,7 +39,7 @@ namespace Nustache.Compilation
 
             var blockExpressions = new List<Expression>();
             blockExpressions.Add(Expression.Assign(builder, Expression.New(typeof(StringBuilder))));
-            blockExpressions.AddRange(expressions.Select(item => 
+            blockExpressions.AddRange(expressions.Select(item =>
                     Expression.Call(builder, typeof(StringBuilder).GetMethod("Append", new Type[] { typeof(string) }), item)));
             blockExpressions.Add(
                     Expression.Call(builder, typeof(StringBuilder).GetMethod("ToString", new Type[0])));
@@ -88,14 +88,14 @@ namespace Nustache.Compilation
 
         public void Visit(EndSection endSections)
         {
-            
+
         }
 
         public void Visit(InvertedBlock invertedBlock)
         {
             parts.Add(context.GetInnerExpressions(invertedBlock.Name, value =>
             {
-                // the logic here is really confusing, but since GetInnerExpressions does 
+                // the logic here is really confusing, but since GetInnerExpressions does
                 // the truthiness check, it is basically the same as Block.Compile
 
                 var visitor = new CompilePartVisitor(context);
@@ -119,9 +119,16 @@ namespace Nustache.Compilation
 
             if (variable.Escaped)
             {
-                var escaperProperty = typeof(Encoders).GetProperty("HtmlEncode", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-                var escaperMethod = (Delegate)escaperProperty.GetValue(null, null);
-                parts.Add(CompoundExpression.IndentOnLineEnd(Expression.Call(null, escaperMethod.Method, getter), context));
+                var htmlEncodeDelegate = Encoders.HtmlEncode;
+                parts.Add(CompoundExpression.IndentOnLineEnd(
+                    Expression.Call(
+                        htmlEncodeDelegate.Target != null ?
+                            Expression.Constant(htmlEncodeDelegate.Target) :
+                            null,
+                        htmlEncodeDelegate.Method,
+                        getter),
+                    context
+                ));
             }
             else
             {

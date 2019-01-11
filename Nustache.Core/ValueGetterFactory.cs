@@ -5,8 +5,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace Nustache.Core
 {
@@ -61,7 +66,7 @@ namespace Nustache.Core
 
             return null;
         }
-        
+
         private static ValueGetter GetValueGetterOrDefault(IEnumerable<ValueGetterFactory> factories, object target, string name)
         {
             foreach (var factory in factories)
@@ -84,6 +89,7 @@ namespace Nustache.Core
             new XmlNodeValueGetterFactory(),
             new XmlNodeListIndexGetterFactory(),
             new PropertyDescriptorValueGetterFactory(),
+            new JObjectValueGetterFactory(),
             new GenericDictionaryValueGetterFactory(),
             new DataRowGetterFactory(),
             new DictionaryValueGetterFactory(),
@@ -123,8 +129,8 @@ namespace Nustache.Core
                 int arrayIndex;
                 bool parseSuccess = Int32.TryParse(name, out arrayIndex);
 
-                /* 
-                 * There is an index as per the success of the parse, it is not greater than the count 
+                /*
+                 * There is an index as per the success of the parse, it is not greater than the count
                  * (minus one since index is zero referenced) or less than zero.
                  */
                 if (parseSuccess &&
@@ -143,17 +149,57 @@ namespace Nustache.Core
     {
         public override ValueGetter GetValueGetter(object target, Type targetType, string name)
         {
-            if (target is ICustomTypeDescriptor)
+            if (target is ICustomTypeDescriptor typeDescriptor)
             {
-                var typeDescriptor = (ICustomTypeDescriptor)target;
                 PropertyDescriptorCollection properties = typeDescriptor.GetProperties();
 
                 foreach (PropertyDescriptor property in properties)
                 {
                     if (String.Equals(property.Name, name, DefaultNameComparison))
                     {
-                        return new PropertyDescriptorValueGetter(target, property);
+                        return new PropertyDescriptorValueGetter(typeDescriptor, property);
                     }
+                }
+            }
+
+            return null;
+        }
+    }
+
+    internal class JObjectValueGetterFactory : ValueGetterFactory
+    {
+        public override ValueGetter GetValueGetter(object target, Type targetType, string name)
+        {
+            // Avoid adding a dependency on Newtonsoft.Json
+            if (target?.GetType().FullName == "Newtonsoft.Json.Linq.JObject" &&
+                target is IDynamicMetaObjectProvider jObject) {
+
+                var param = Expression.Parameter(typeof(object));
+                var meta = jObject.GetMetaObject(param);
+
+                if (meta.GetDynamicMemberNames().Contains(name, StringComparer.OrdinalIgnoreCase))
+                {
+                    // Use dynamic binding to access the member
+                    var scope = target.GetType();
+                    var binder =
+                        (GetMemberBinder)Microsoft.CSharp.RuntimeBinder.Binder.GetMember(
+                            flags: CSharpBinderFlags.None,
+                            name: name,
+                            context: scope,
+                            argumentInfo: new CSharpArgumentInfo[] {
+                                CSharpArgumentInfo.Create(0, null)
+                            }
+                        );
+                    var dynamicMember = meta.BindGetMember(binder);
+                    var lambda = Expression.Lambda(
+                        Expression.Block(
+                            Expression.Label(CallSiteBinder.UpdateLabel),
+                            dynamicMember.Expression
+                        ),
+                        param
+                    );
+
+                    return new JObjectValueGetter(jObject, lambda.Compile());
                 }
             }
 
@@ -258,7 +304,7 @@ namespace Nustache.Core
                 {
                     return new GenericDictionaryValueGetter(null, name, dictionaryType);
                 }
-                else 
+                else
                 {
                     var containsKeyMethod = dictionaryType.GetMethod("ContainsKey");
                     if ((bool)containsKeyMethod.Invoke(target, new object[] { name }))
@@ -299,10 +345,10 @@ namespace Nustache.Core
                 int arrayIndex;
                 bool parseSuccess = Int32.TryParse(name, out arrayIndex);
 
-                /* 
-                 * There is an index as per the success of the parse, it is not greater than the count 
+                /*
+                 * There is an index as per the success of the parse, it is not greater than the count
                  * (minus one since index is zero referenced) or less than zero.
-                 */ 
+                 */
                 if(parseSuccess &&
                    !(arrayIndex > (listTarget.Count - 1)) &&
                    !(arrayIndex < 0))

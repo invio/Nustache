@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Web.Script.Serialization;
 using System.Xml;
+using Newtonsoft.Json;
 using Nustache.Core;
 
 namespace nustache
@@ -29,9 +28,8 @@ namespace nustache
             if (string.Equals(ext, ".js", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(ext, ".json", StringComparison.OrdinalIgnoreCase))
             {
-                var serializer = new JavaScriptSerializer();
                 string json = File.ReadAllText(dataPath);
-                data = serializer.Deserialize<IDictionary<string, object>>(json);
+                data = JsonConvert.DeserializeObject(json);
             }
             else if (string.Equals(ext, ".xml", StringComparison.OrdinalIgnoreCase))
             {

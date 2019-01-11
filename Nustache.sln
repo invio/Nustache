@@ -17,13 +17,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nustache", "nustache\nustac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nustache.Core.Tests", "Nustache.Core.Tests\Nustache.Core.Tests.csproj", "{872BE5F3-E52A-45C8-BEEB-1A9540F24153}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nustache.Mvc3.Example", "Nustache.Mvc3.Example\Nustache.Mvc3.Example.csproj", "{326AEAC1-FBCD-4FB2-8141-20F873CFF68F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nustache.Mvc3", "Nustache.Mvc3\Nustache.Mvc3.csproj", "{BB62330D-3604-40EB-9B76-39CE36F1AD6F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nustache.Compilation", "Nustache.Compilation\Nustache.Compilation.csproj", "{BE490269-ABD0-4FCE-802D-6B9ACF147E66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nustache.Compilation.Tests", "Nustache.Compilation.Tests\Nustache.Compilation.Tests.csproj", "{4EC98A3B-4112-4CF0-81BC-D471F6192203}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{C81F70D4-83A0-42C9-8005-C66EBFC63873}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonCSharpClassGeneratorLib", "lib\jsonclassgenerator\src\JsonCSharpClassGeneratorLib\JsonCSharpClassGeneratorLib.csproj", "{B2E305B6-30E8-47B2-95A9-29F2E911288C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Entity.Design.PluralizationServices", "lib\jsonclassgenerator\src\System.Data.Entity.Design.PluralizationServices\System.Data.Entity.Design.PluralizationServices.csproj", "{177143FB-1336-4246-BDC7-6006F558F919}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,12 +45,6 @@ Global
 		{872BE5F3-E52A-45C8-BEEB-1A9540F24153}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{872BE5F3-E52A-45C8-BEEB-1A9540F24153}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{872BE5F3-E52A-45C8-BEEB-1A9540F24153}.Release|Any CPU.Build.0 = Release|Any CPU
-		{326AEAC1-FBCD-4FB2-8141-20F873CFF68F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{326AEAC1-FBCD-4FB2-8141-20F873CFF68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB62330D-3604-40EB-9B76-39CE36F1AD6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB62330D-3604-40EB-9B76-39CE36F1AD6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB62330D-3604-40EB-9B76-39CE36F1AD6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB62330D-3604-40EB-9B76-39CE36F1AD6F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BE490269-ABD0-4FCE-802D-6B9ACF147E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BE490269-ABD0-4FCE-802D-6B9ACF147E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE490269-ABD0-4FCE-802D-6B9ACF147E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,8 +53,20 @@ Global
 		{4EC98A3B-4112-4CF0-81BC-D471F6192203}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EC98A3B-4112-4CF0-81BC-D471F6192203}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EC98A3B-4112-4CF0-81BC-D471F6192203}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2E305B6-30E8-47B2-95A9-29F2E911288C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2E305B6-30E8-47B2-95A9-29F2E911288C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2E305B6-30E8-47B2-95A9-29F2E911288C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2E305B6-30E8-47B2-95A9-29F2E911288C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{177143FB-1336-4246-BDC7-6006F558F919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{177143FB-1336-4246-BDC7-6006F558F919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{177143FB-1336-4246-BDC7-6006F558F919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{177143FB-1336-4246-BDC7-6006F558F919}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2E305B6-30E8-47B2-95A9-29F2E911288C} = {C81F70D4-83A0-42C9-8005-C66EBFC63873}
+		{177143FB-1336-4246-BDC7-6006F558F919} = {C81F70D4-83A0-42C9-8005-C66EBFC63873}
 	EndGlobalSection
 EndGlobal
